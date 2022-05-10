@@ -1,0 +1,124 @@
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String
+  profileId    String  @unique
+  profile      Profile @relation(fields: [profileId], references: [id])
+}
+
+model Profile {
+  id                 String        @id @default(uuid())
+  firstName          String
+  lastName           String
+  birthDay           Int
+  birthMonth         Int
+  birthYear          Int
+  bio                String
+  user               User?
+  posts              ProfilePost[]
+  followedProfiles   Profile[]     @relation("ProfileFollower")
+  followedGroups     Group[]       @relation("GroupMember")
+  followers          Profile[]     @relation("ProfileFollower")
+  ownedGroups        Group[]       @relation("GroupAuthor")
+  authoredGroupPosts GroupPost[]
+}
+
+model Group {
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  authorId    String
+  author      Profile     @relation("GroupAuthor", fields: [authorId], references: [id])
+  members     Profile[]   @relation("GroupMember")
+  posts       GroupPost[]
+}
+
+model ProfilePost {
+  id       String  @id @default(uuid())
+  text     String
+  photos   Photo[]
+  videos   Video[]
+  audios   Audio[]
+  authorId String
+  author   Profile @relation(fields: [authorId], references: [id])
+}
+
+model GroupPost {
+  id       String  @id @default(uuid())
+  text     String
+  photos   Photo[]
+  videos   Video[]
+  audios   Audio[]
+  authorId String
+  author   Profile @relation(fields: [authorId], references: [id])
+  groupId  String
+  group    Group   @relation(fields: [groupId], references: [id])
+}
+
+model Photo {
+  id           String        @id @default(uuid())
+  sourceId     String        @unique
+  source       Source        @relation("PhotoSource", fields: [sourceId], references: [id])
+  profilePosts ProfilePost[]
+  groupPosts   GroupPost[]
+}
+
+model Video {
+  id           String        @id @default(uuid())
+  sourceId     String        @unique
+  source       Source        @relation("VideoSource", fields: [sourceId], references: [id])
+  profilePosts ProfilePost[]
+  groupPosts   GroupPost[]
+}
+
+model Audio {
+  id           String        @id @default(uuid())
+  imageId      String        @unique
+  image        Source        @relation("AudioImage", fields: [imageId], references: [id])
+  artists      Artist[]
+  name         String
+  durationMs   Int
+  sourceId     String        @unique
+  source       Source        @relation("AudioSource", fields: [sourceId], references: [id])
+  profilePosts ProfilePost[]
+  groupPosts   GroupPost[]
+}
+
+model Artist {
+  id     String  @id @default(uuid())
+  name   String
+  audios Audio[]
+}
+
+model File {
+  id       String @id @default(uuid())
+  sourceId String @unique
+  source   Source @relation("FileSource", fields: [sourceId], references: [id])
+}
+
+enum FileType {
+  Image
+  Video
+  Audio
+  File
+}
+
+model Source {
+  id           String   @id @default(uuid())
+  type         FileType
+  url          String
+  photos       Photo[]  @relation("PhotoSource")
+  videos       Video[]  @relation("VideoSource")
+  imageAudios  Audio[]  @relation("AudioImage")
+  sourceAudios Audio[]  @relation("AudioSource")
+  files        File[]   @relation("FileSource")
+}
