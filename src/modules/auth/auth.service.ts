@@ -2,15 +2,11 @@ import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
-import { UserService } from '../user'
 import { JwtPayload } from './types'
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private userService: UserService,
-    private jwtService: JwtService
-  ) {}
+  constructor(private jwtService: JwtService) {}
 
   private readonly HASH_ROUNDS = 10
 
@@ -18,12 +14,8 @@ export class AuthService {
     return bcrypt.hash(password, this.HASH_ROUNDS)
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.findOne({ email })
-    if (!user) return null
-    const match = await bcrypt.compare(password, user.passwordHash)
-    if (!match) return null
-    return user
+  async validateUser(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash)
   }
 
   async generateAccessToken(user: User): Promise<string> {

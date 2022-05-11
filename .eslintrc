@@ -19,5 +19,8 @@
         "alwaysTryTypes": true
       }
     }
+  },
+  "rules": {
+    "unicorn/prefer-number-properties": ["error", { "checkInfinity": false }]
   }
 }

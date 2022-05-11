@@ -8,22 +8,29 @@ generator client {
 }
 
 model User {
-  id           String  @id @default(uuid())
-  email        String  @unique
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  email        String   @unique
   passwordHash String
-  profileId    String  @unique
-  profile      Profile @relation(fields: [profileId], references: [id])
+
+  profile Profile?
 }
 
 model Profile {
-  id                 String        @id @default(uuid())
-  firstName          String
-  lastName           String
-  birthDay           Int
-  birthMonth         Int
-  birthYear          Int
-  bio                String
-  user               User?
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  firstName  String
+  lastName   String
+  birthDay   Int
+  birthMonth Int
+  birthYear  Int
+  bio        String   @default("")
+
+  userId             String        @unique
+  user               User          @relation(fields: [userId], references: [id])
+  link               PublicLink?
   posts              ProfilePost[]
   followedProfiles   Profile[]     @relation("ProfileFollower")
   followedGroups     Group[]       @relation("GroupMember")
@@ -33,39 +40,64 @@ model Profile {
 }
 
 model Group {
-  id          String      @id @default(uuid())
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   name        String
   description String
-  authorId    String
-  author      Profile     @relation("GroupAuthor", fields: [authorId], references: [id])
-  members     Profile[]   @relation("GroupMember")
-  posts       GroupPost[]
+
+  authorId Int
+  author   Profile     @relation("GroupAuthor", fields: [authorId], references: [id])
+  link     PublicLink?
+  members  Profile[]   @relation("GroupMember")
+  posts    GroupPost[]
+}
+
+model PublicLink {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  link      String
+
+  profileId Int?     @unique
+  profile   Profile? @relation(fields: [profileId], references: [id])
+  groupId   Int?     @unique
+  group     Group?   @relation(fields: [groupId], references: [id])
 }
 
 model ProfilePost {
-  id       String  @id @default(uuid())
-  text     String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String
+
   photos   Photo[]
   videos   Video[]
   audios   Audio[]
-  authorId String
+  authorId Int
   author   Profile @relation(fields: [authorId], references: [id])
 }
 
 model GroupPost {
-  id       String  @id @default(uuid())
-  text     String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String
+
   photos   Photo[]
   videos   Video[]
   audios   Audio[]
-  authorId String
+  authorId Int
   author   Profile @relation(fields: [authorId], references: [id])
-  groupId  String
+  groupId  Int
   group    Group   @relation(fields: [groupId], references: [id])
 }
 
 model Photo {
-  id           String        @id @default(uuid())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   sourceId     String        @unique
   source       Source        @relation("PhotoSource", fields: [sourceId], references: [id])
   profilePosts ProfilePost[]
@@ -73,7 +105,10 @@ model Photo {
 }
 
 model Video {
-  id           String        @id @default(uuid())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   sourceId     String        @unique
   source       Source        @relation("VideoSource", fields: [sourceId], references: [id])
   profilePosts ProfilePost[]
@@ -81,12 +116,15 @@ model Video {
 }
 
 model Audio {
-  id           String        @id @default(uuid())
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  name       String
+  durationMs Int
+
+  artists      Artist[]
   imageId      String        @unique
   image        Source        @relation("AudioImage", fields: [imageId], references: [id])
-  artists      Artist[]
-  name         String
-  durationMs   Int
   sourceId     String        @unique
   source       Source        @relation("AudioSource", fields: [sourceId], references: [id])
   profilePosts ProfilePost[]
@@ -94,13 +132,19 @@ model Audio {
 }
 
 model Artist {
-  id     String  @id @default(uuid())
-  name   String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+
   audios Audio[]
 }
 
 model File {
-  id       String @id @default(uuid())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   sourceId String @unique
   source   Source @relation("FileSource", fields: [sourceId], references: [id])
 }
@@ -112,13 +156,25 @@ enum FileType {
   File
 }
 
+// Represents a link to the file uploaded somewhere
+// It can be used multiple times in the different documents
 model Source {
-  id           String   @id @default(uuid())
-  type         FileType
-  url          String
-  photos       Photo[]  @relation("PhotoSource")
-  videos       Video[]  @relation("VideoSource")
-  imageAudios  Audio[]  @relation("AudioImage")
-  sourceAudios Audio[]  @relation("AudioSource")
-  files        File[]   @relation("FileSource")
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      FileType
+  url       String
+
+  // "hash" field is used to determine if some file was already uploaded
+  // If it's already uploaded - we simply use the existing Source for creating a document
+  // Otherwise - we upload a file and create a new Source
+  hash String
+
+  // Relations may help in checking if Source is not used anywhere
+  // In that case, we can safely delete the file from static server
+  photos       Photo[] @relation("PhotoSource")
+  videos       Video[] @relation("VideoSource")
+  imageAudios  Audio[] @relation("AudioImage")
+  sourceAudios Audio[] @relation("AudioSource")
+  files        File[]  @relation("FileSource")
 }

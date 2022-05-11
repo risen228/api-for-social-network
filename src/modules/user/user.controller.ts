@@ -5,6 +5,11 @@ import { UserService } from './user.service'
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get('/')
+  async findMany() {
+    return this.userService.findMany({})
+  }
+
   @Get('/:id')
   async findOne(@Param('id') id: string) {
     return this.userService.findOne({ id })
