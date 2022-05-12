@@ -22,3 +22,9 @@ Running locally:
 5. Run the application in watch mode: `yarn start:dev`
 
 6. Congratulations! Now you can access the API on `http://localhost:5050`
+
+## API Reference (in progress)
+
+Swagger UI - `/api`
+
+OpenAPI JSON - `/api-json`
