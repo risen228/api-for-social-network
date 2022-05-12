@@ -1,17 +1,11 @@
-import { Controller, Get, Param } from '@nestjs/common'
-import { UserService } from './user.service'
+import { Controller, Get } from '@nestjs/common'
+import { User } from '@prisma/client'
+import { CurrentUser } from './current-user.decorator'
 
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
-
-  @Get('/')
-  async findMany() {
-    return this.userService.findMany({})
-  }
-
-  @Get('/:id')
-  async findOne(@Param('id') id: string) {
-    return this.userService.findOne({ id })
+  @Get('/me')
+  async findOne(@CurrentUser() user: User) {
+    return user
   }
 }
