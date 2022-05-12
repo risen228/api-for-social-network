@@ -1,4 +1,5 @@
 import { Controller, Post, UseGuards } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
 import { CurrentUser, UserService } from '../user'
 import { ZodBody, ZodGuardBody } from '../zod'
@@ -12,6 +13,7 @@ import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './local-auth.guard'
 import { Public } from './public.decorator'
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
