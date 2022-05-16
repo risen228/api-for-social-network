@@ -1,4 +1,4 @@
-import { RefinementCtx, ZodCustomIssue } from 'zod'
+import { RefinementCtx, ZodCustomIssue } from 'nestjs-zod/z'
 
 interface IssuePayload {
   code: string

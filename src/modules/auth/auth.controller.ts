@@ -1,12 +1,20 @@
-import { Controller, Post, UseGuards } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common'
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { User } from '@prisma/client'
+import { UseZodGuard } from 'nestjs-zod'
 import { CurrentUser, UserService } from '../user'
-import { ZodBody, ZodGuardBody } from '../zod'
 import {
   SignInBodySchema,
-  SignUpBody,
-  SignUpBodySchema,
+  SignInBodyDto,
+  SignUpBodyDto,
+  LoggedInResponseDto,
 } from './auth.contracts'
 import { UserAlreadyExistsException } from './auth.exceptions'
 import { AuthService } from './auth.service'
@@ -24,16 +32,19 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   // validate body before running the local strategy
-  @ZodGuardBody(SignInBodySchema)
+  @UseZodGuard('body', SignInBodySchema)
+  @ApiOkResponse({ type: LoggedInResponseDto })
   @Post('/sign-in')
-  async signIn(@CurrentUser() user: User) {
+  async signIn(@CurrentUser() user: User, @Body() _signInBody: SignInBodyDto) {
     const accessToken = await this.authService.generateAccessToken(user)
-    return { accessToken }
+    return { user, accessToken }
   }
 
   @Public()
+  @ApiCreatedResponse({ type: LoggedInResponseDto })
+  @HttpCode(HttpStatus.CREATED)
   @Post('/sign-up')
-  async signUp(@ZodBody(SignUpBodySchema) signUpBody: SignUpBody) {
+  async signUp(@Body() signUpBody: SignUpBodyDto) {
     const {
       email,
       password,

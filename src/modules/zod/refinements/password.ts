@@ -1,4 +1,4 @@
-import { RefinementCtx } from 'zod'
+import { RefinementCtx } from 'nestjs-zod/z'
 import { addIssue } from '../lib/add-issue'
 
 export function password() {

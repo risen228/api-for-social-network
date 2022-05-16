@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'nestjs-zod/z'
 import { Env } from './types'
 
 const EnvSchema = z.object({
