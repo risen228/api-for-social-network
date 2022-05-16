@@ -1,11 +1,11 @@
 import { INestApplication } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { patchNestjsSwagger } from 'nestjs-zod'
+import { patchNestJsSwagger } from 'nestjs-zod'
 import { AppModule } from '@app/modules/app'
 
 function setupSwagger(app: INestApplication) {
-  patchNestjsSwagger()
+  patchNestJsSwagger()
 
   const config = new DocumentBuilder()
     .setTitle('API For Social Network')

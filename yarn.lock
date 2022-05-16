@@ -4609,10 +4609,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-zod@^0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/nestjs-zod/-/nestjs-zod-0.3.2.tgz#26e3fc8426efdedb5905aaa85db0e01f4a374be6"
-  integrity sha512-Fzh7CtsR8Je0zt8f4dTxDZgCDK8O6AyHfCESSoroW8La4jwBAgv5yiXi/7AmElCUM92qStERExkzpiOkmk/8/w==
+nestjs-zod@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/nestjs-zod/-/nestjs-zod-0.3.7.tgz#6da87438a057043d9e0aaed2c3e778a67aa295ab"
+  integrity sha512-vU7LlWXA02eb8X19jwUNg37sgCEcwkp/EtmdbzQE3GpU0i19ZKMcy89ANSBb5bQNJfifOtoEFygUYHz5C6s79w==
   dependencies:
     merge-deep "^3.0.3"
     zod "3.14.3"
